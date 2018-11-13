@@ -3,6 +3,7 @@ local ll = require "level_loader"
 function loadImages()
     imageLib = {}
     imageLib.hashImg = love.graphics.newImage("images/hash.png")
+    imageLib.robotImg = love.graphics.newImage("images/robot.png")
     return imageLib
 end
 
@@ -25,12 +26,15 @@ function love.draw()
     yOffset = 32
     for coord, c in pairs(theLvl) do
         if type(coord) == "table" then
-            -- print(''..coord[1]..","..coord[2])
             if c == "#" then
                 local x = xOffset + coord[1]*16
                 local y = yOffset + coord[2]*16
-                -- print("("..x..", "..y..")")
                 love.graphics.draw(imgs.hashImg, x, y)
+            end
+            if c == "R" then
+                local x = xOffset + coord[1]*16 - 16
+                local y = yOffset + coord[2]*16 - 16
+                love.graphics.draw(imgs.robotImg, x, y)
             end
         end
     end
