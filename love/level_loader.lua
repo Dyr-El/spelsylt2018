@@ -49,19 +49,22 @@ function loadLevel(fileName)
 end
 
 function parseHash(lvl, x, y)
-    xdest = x
-    while lvl[y][xdest] == "#" do
-        lvl[y][xdest] = " "
-        xdest = xdest + 1
-    end
-    lvl.floors[#(lvl.floors)+1] = {x*16, (y-1)*16, xdest*16, y*16}
+    lvl[y][x] = " "
+    floor = {}
+    floor.x = x*16
+    floor.y = (y-1)*16
+    floor.objType = "floor"
+    lvl.floors[#(lvl.floors)+1] = floor
 end
 
 function parseRobot(lvl, x, y)
-    lvl.robot.coords = {x*16, (y-2)*16}
-    print(x*16, (y-2)*16)
+    lvl.robot.x = x*16
+    lvl.robot.y = (y-2)*16
     lvl.robot.id = tonumber(lvl[y][x+1])
-    lvl.robot.dir = 0
+    lvl.robot.vx = 0
+    lvl.robot.vy = 0
+    lvl.robot.jump = false
+    lvl.robot.objType = "robot"
     lvl[y  ][x  ] = " "
     lvl[y  ][x+1] = " "
     lvl[y-1][x  ] = " "
