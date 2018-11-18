@@ -71,14 +71,30 @@ function parseRobot(lvl, x, y)
     lvl[y-1][x+1] = " "
 end
 
+function parseGate(lvl, x, y)
+    lvl.gate.x = x*16
+    lvl.gate.y = (y-2)*16
+    lvl.gate.id = tonumber(lvl[y][x+1])
+    lvl.gate.vx = 0
+    lvl.gate.vy = 0
+    lvl.gate.jump = false
+    lvl.gate.objType = "gate"
+    lvl[y  ][x  ] = " "
+    lvl[y  ][x+1] = " "
+    lvl[y-1][x  ] = " "
+    lvl[y-1][x+1] = " "
+end
+
 levelParsers = {
     ["#"]=parseHash,
-    ["R"]=parseRobot
+    ["R"]=parseRobot,
+    ["@"]=parseGate
 }
 
 function parseLevel(lvl)
     lvl.floors = {}
     lvl.robot = {}
+    lvl.gate = {}
     for y = lvl.dimY, 0, -1 do
         for x = 0, lvl.dimX, 1 do
             ch = lvl[y] and lvl[y][x]
