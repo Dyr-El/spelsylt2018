@@ -76,7 +76,7 @@ function updateRobotPos(robot, dt)
     robot.x, robot.y = actX, actY
 end
 
-commandQueue = {{5, "d"}, {1.5, "dw"}, {1, ""}, {5, "d"}, {1.5, "dw"}, pos=1}
+commandQueue = {{5, " "},{5, "d"}, {1.5, "dw"}, {1, ""}, {5, "d"}, {1.5, "dw"}, pos=1}
 function updateCommands(robot, dt)
     cmd = commandQueue[commandQueue.pos]
     if cmd then
@@ -93,6 +93,7 @@ end
 
 function love.update(dt)
     local robot = dynamicObjects.robot
+    print(robot.vx)
     if love.keyboard.isDown("q") or levelWon then
         love.event.quit(0)
     end
