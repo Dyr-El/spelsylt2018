@@ -49,19 +49,36 @@ function loadLevel(fileName)
 end
 
 function parseHash(lvl, x, y)
-    xdest = x
-    while lvl[y][xdest] == "#" do
-        lvl[y][xdest] = " "
-        xdest = xdest + 1
-    end
-    lvl.floors[#(lvl.floors)+1] = {x*16, (y-1)*16, xdest*16, y*16}
+    lvl[y][x] = " "
+    floor = {}
+    floor.x = x*16
+    floor.y = (y-1)*16
+    floor.objType = "floor"
+    lvl.floors[#(lvl.floors)+1] = floor
 end
 
 function parseRobot(lvl, x, y)
-    lvl.robot.coords = {x*16, (y-2)*16}
-    print(x*16, (y-2)*16)
+    lvl.robot.x = x*16
+    lvl.robot.y = (y-2)*16
     lvl.robot.id = tonumber(lvl[y][x+1])
-    lvl.robot.dir = 0
+    lvl.robot.vx = 0
+    lvl.robot.vy = 0
+    lvl.robot.jump = false
+    lvl.robot.objType = "robot"
+    lvl[y  ][x  ] = " "
+    lvl[y  ][x+1] = " "
+    lvl[y-1][x  ] = " "
+    lvl[y-1][x+1] = " "
+end
+
+function parseGate(lvl, x, y)
+    lvl.gate.x = x*16
+    lvl.gate.y = (y-2)*16
+    lvl.gate.id = tonumber(lvl[y][x+1])
+    lvl.gate.vx = 0
+    lvl.gate.vy = 0
+    lvl.gate.jump = false
+    lvl.gate.objType = "gate"
     lvl[y  ][x  ] = " "
     lvl[y  ][x+1] = " "
     lvl[y-1][x  ] = " "
@@ -70,12 +87,14 @@ end
 
 levelParsers = {
     ["#"]=parseHash,
-    ["R"]=parseRobot
+    ["R"]=parseRobot,
+    ["@"]=parseGate
 }
 
 function parseLevel(lvl)
     lvl.floors = {}
     lvl.robot = {}
+    lvl.gate = {}
     for y = lvl.dimY, 0, -1 do
         for x = 0, lvl.dimX, 1 do
             ch = lvl[y] and lvl[y][x]
