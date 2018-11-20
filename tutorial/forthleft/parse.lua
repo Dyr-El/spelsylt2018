@@ -6,8 +6,9 @@
 -- An address is 32 bits
 -- A character aligend address is the same as an address
 -- An aligned address is and address with the two least significant bits set to 0
+-- http://beza1e1.tuxen.de/articles/forth.html
 
-InputStream = {buffer = "", idx = 1}
+InputStream = {buffer = "", idx = 1, tokenIdx = 1}
 InputStream.new = function(self, object)
     object = object or {}
     setmetatable(object, self)
@@ -37,6 +38,10 @@ InputStream.consume = function(self, count)
     self.idx = self.idx + count
 end
 
+InputStream.endOfStream = function(self)
+    return false
+end
+
 InputStream.print = function (self)
     io.write("[")
     io.write(self.buffer)
@@ -45,6 +50,19 @@ InputStream.print = function (self)
         io.write(" ")
     end
     io.write("^\n")
+end
+
+Dictionary = {words = {}}
+
+Dictionary.new = function(self, object)
+    object = object or {}
+    setmetatable(object, self)
+    self.__index = self
+    return object
+end
+
+Dictionary.hasWord = function(self, word)
+    return self.word[word] and true
 end
 
 function isWhitespace(c)
@@ -64,10 +82,22 @@ function skipSpaces(inp)
     end
 end
 
+function getToken(inp)
+    if inp:empty() then
+        inp:refill()
+    end
+    s = ""
+    while not inp:endOfStream() and not isWhitespace(inp:next()) do
+        s = s..inp:next()
+        inp:consume()
+        print(">"..s.."<")
+        if inp:empty() then
+            inp:refill()
+        end
+    end
+    return s
+end
+
 myStream = InputStream:new()
 skipSpaces(myStream)
-while not myStream:empty() do
-    io.write(myStream:next())
-    myStream:consume()
-end
-print()
+print("("..getToken(myStream)..")")
