@@ -21,8 +21,7 @@ InputStream.empty = function(self)
 end
 
 InputStream.refill = function(self)
-    -- TODO: Really inefficient!
-    self.buffer = self.buffer .. io.read()
+    self.buffer = self.buffer .. " " .. io.read()
 end
 
 InputStream.next = function(self)
@@ -62,11 +61,66 @@ Dictionary.new = function(self, object)
 end
 
 Dictionary.hasWord = function(self, word)
-    return self.word[word] and true
+    return self.words[word] and true
+end
+
+Dictionary.addWord = function(self, word, func)
+    self.words[word] = func
+end
+
+Dictionary.doWord = function(self, word, stack)
+    self.words[word](stack)
+end
+
+Stack = {stack=nil}
+Stack.new = function(self, object)
+    object = object or {}
+    setmetatable(object, self)
+    self.__index = self
+    return object
+end
+
+Stack.push = function(self, cell)
+    self.stack = {data=cell, next=self.stack}
+end
+
+Stack.top = function(self)
+    return self.stack.data
+end
+
+Stack.drop = function(self)
+    self.stack = self.stack.next
+end
+
+Stack.pop = function(self)
+    cell = self:top()
+    self:drop()
+    return cell
+end
+
+Stack.empty = function(self)
+    return self.stack == nil
+end
+
+function cmdAdd(stack)
+    t1 = stack:pop()
+    t2 = stack:pop()
+    stack:push(t1+t2)
+end
+
+function cmdPrint(stack)
+    s = stack:pop()
+    print(s)
 end
 
 function isWhitespace(c)
+    -- Not according to forth specification
     return c:find("%s") == 1
+end
+
+function parseNumber(s)
+    -- TODO: Add handling of differnet bases?
+    return tonumber(s)
 end
 
 function skipSpaces(inp)
@@ -90,7 +144,6 @@ function getToken(inp)
     while not inp:endOfStream() and not isWhitespace(inp:next()) do
         s = s..inp:next()
         inp:consume()
-        print(">"..s.."<")
         if inp:empty() then
             inp:refill()
         end
@@ -99,5 +152,21 @@ function getToken(inp)
 end
 
 myStream = InputStream:new()
-skipSpaces(myStream)
-print("("..getToken(myStream)..")")
+dict = Dictionary:new()
+dict:addWord("+", cmdAdd)
+dict:addWord("print", cmdPrint)
+dataStack = Stack:new()
+while true do
+    skipSpaces(myStream)
+    token = getToken(myStream)
+    if dict:hasWord(token) then
+        dict:doWord(token, dataStack)
+    else
+        num = parseNumber(token)
+        if num then
+            dataStack:push(num)
+        else
+            print("Error:", token)
+        end
+    end
+end
