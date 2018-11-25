@@ -93,7 +93,6 @@ end
 
 function love.update(dt)
     local robot = dynamicObjects.robot
-    print(robot.vx)
     if love.keyboard.isDown("q") or levelWon then
         love.event.quit(0)
     end
