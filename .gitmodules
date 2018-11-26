@@ -1,0 +1,3 @@
+[submodule "love/lib/polywell"]
+	path = love/lib/polywell
+	url = https://gitlab.com/technomancy/polywell.git
